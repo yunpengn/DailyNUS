@@ -20,6 +20,32 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_home"
-        app:menu="@menu/activity_home_drawer" />
+        >
+
+        <SearchView
+            android:layout_marginTop="160dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:iconifiedByDefault="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:queryHint="search">
+
+        </SearchView>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_marginTop="220dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>
