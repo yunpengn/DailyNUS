@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ind.hailin.dailynus.dao.ChatDialoguesDao">
+  <resultMap id="BaseResultMap" type="ind.hailin.dailynus.entity.ChatDialogues">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="sender_id" jdbcType="INTEGER" property="senderId" />
+    <result column="receiver_id" jdbcType="INTEGER" property="receiverId" />
+    <result column="is_read" jdbcType="BIT" property="isRead" />
+    <result column="receiver_type" jdbcType="INTEGER" property="receiverType" />
+    <result column="mime_type" jdbcType="INTEGER" property="mimeType" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, sender_id, receiver_id, is_read, receiver_type, mime_type, message, url, updated_at
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from chat_dialogues
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from chat_dialogues
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="ind.hailin.dailynus.entity.ChatDialogues">
+    insert into chat_dialogues (id, sender_id, receiver_id, 
+      is_read, receiver_type, mime_type, 
+      message, url, updated_at
+      )
+    values (#{id,jdbcType=INTEGER}, #{senderId,jdbcType=INTEGER}, #{receiverId,jdbcType=INTEGER}, 
+      #{isRead,jdbcType=BIT}, #{receiverType,jdbcType=INTEGER}, #{mimeType,jdbcType=INTEGER}, 
+      #{message,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{updatedAt,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="ind.hailin.dailynus.entity.ChatDialogues">
+    insert into chat_dialogues
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="senderId != null">
+        sender_id,
+      </if>
+      <if test="receiverId != null">
+        receiver_id,
+      </if>
+      <if test="isRead != null">
+        is_read,
+      </if>
+      <if test="receiverType != null">
+        receiver_type,
+      </if>
+      <if test="mimeType != null">
+        mime_type,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="senderId != null">
+        #{senderId,jdbcType=INTEGER},
+      </if>
+      <if test="receiverId != null">
+        #{receiverId,jdbcType=INTEGER},
+      </if>
+      <if test="isRead != null">
+        #{isRead,jdbcType=BIT},
+      </if>
+      <if test="receiverType != null">
+        #{receiverType,jdbcType=INTEGER},
+      </if>
+      <if test="mimeType != null">
+        #{mimeType,jdbcType=INTEGER},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="ind.hailin.dailynus.entity.ChatDialogues">
+    update chat_dialogues
+    <set>
+      <if test="senderId != null">
+        sender_id = #{senderId,jdbcType=INTEGER},
+      </if>
+      <if test="receiverId != null">
+        receiver_id = #{receiverId,jdbcType=INTEGER},
+      </if>
+      <if test="isRead != null">
+        is_read = #{isRead,jdbcType=BIT},
+      </if>
+      <if test="receiverType != null">
+        receiver_type = #{receiverType,jdbcType=INTEGER},
+      </if>
+      <if test="mimeType != null">
+        mime_type = #{mimeType,jdbcType=INTEGER},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="ind.hailin.dailynus.entity.ChatDialogues">
+    update chat_dialogues
+    set sender_id = #{senderId,jdbcType=INTEGER},
+      receiver_id = #{receiverId,jdbcType=INTEGER},
+      is_read = #{isRead,jdbcType=BIT},
+      receiver_type = #{receiverType,jdbcType=INTEGER},
+      mime_type = #{mimeType,jdbcType=INTEGER},
+      message = #{message,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

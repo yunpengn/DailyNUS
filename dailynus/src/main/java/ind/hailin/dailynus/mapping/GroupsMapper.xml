@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ind.hailin.dailynus.dao.GroupsDao">
+  <resultMap id="BaseResultMap" type="ind.hailin.dailynus.entity.Groups">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="creator_id" jdbcType="INTEGER" property="creatorId" />
+    <result column="is_module_group" jdbcType="BIT" property="isModuleGroup" />
+    <result column="members_count" jdbcType="INTEGER" property="membersCount" />
+    <result column="avatar" jdbcType="VARCHAR" property="avatar" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, creator_id, is_module_group, members_count, avatar, updated_at
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from groups
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from groups
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="ind.hailin.dailynus.entity.Groups">
+    insert into groups (id, name, creator_id, 
+      is_module_group, members_count, avatar, 
+      updated_at)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{creatorId,jdbcType=INTEGER}, 
+      #{isModuleGroup,jdbcType=BIT}, #{membersCount,jdbcType=INTEGER}, #{avatar,jdbcType=VARCHAR}, 
+      #{updatedAt,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="ind.hailin.dailynus.entity.Groups">
+    insert into groups
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="creatorId != null">
+        creator_id,
+      </if>
+      <if test="isModuleGroup != null">
+        is_module_group,
+      </if>
+      <if test="membersCount != null">
+        members_count,
+      </if>
+      <if test="avatar != null">
+        avatar,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="isModuleGroup != null">
+        #{isModuleGroup,jdbcType=BIT},
+      </if>
+      <if test="membersCount != null">
+        #{membersCount,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null">
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="ind.hailin.dailynus.entity.Groups">
+    update groups
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        creator_id = #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="isModuleGroup != null">
+        is_module_group = #{isModuleGroup,jdbcType=BIT},
+      </if>
+      <if test="membersCount != null">
+        members_count = #{membersCount,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null">
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="ind.hailin.dailynus.entity.Groups">
+    update groups
+    set name = #{name,jdbcType=VARCHAR},
+      creator_id = #{creatorId,jdbcType=INTEGER},
+      is_module_group = #{isModuleGroup,jdbcType=BIT},
+      members_count = #{membersCount,jdbcType=INTEGER},
+      avatar = #{avatar,jdbcType=VARCHAR},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
