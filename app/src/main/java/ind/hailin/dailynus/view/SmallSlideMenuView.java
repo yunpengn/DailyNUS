@@ -90,7 +90,8 @@ public class SmallSlideMenuView extends RelativeLayout implements View.OnClickLi
                 else closeMenu();
                 break;
             case R.id.view_delete:
-                deleteItemListener.onDelete();
+                if(deleteItemListener != null)
+                    deleteItemListener.onDelete();
                 break;
             case R.id.view_clear:
                 tvMenuUnder.setText("");

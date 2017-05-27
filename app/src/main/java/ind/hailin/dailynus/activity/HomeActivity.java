@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +15,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ind.hailin.dailynus.R;
 
@@ -40,6 +47,11 @@ public class HomeActivity extends AppCompatActivity {
         //TODO
         findViewById(R.id.nav_view);
 
+//        //TODO delete later
+//        List<String> list = new ArrayList<>();
+//        for (int i = 0; i < 20; i++) {
+//            list.add("item " + i);
+//        }
 
 
     }
@@ -66,11 +78,9 @@ public class HomeActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()){
+            case R.id.action_menu_settings:
+                break;
         }
 
         return super.onOptionsItemSelected(item);

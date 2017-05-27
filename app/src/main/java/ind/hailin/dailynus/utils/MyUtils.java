@@ -1,15 +1,21 @@
 package ind.hailin.dailynus.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 /**
  * Created by hailin on 2017/5/15.
  */
 
 public class MyUtils {
+    /**
+     * convert drawable to bitmap
+     */
     public static Bitmap drawableToBitmap(Drawable drawable) {
         int w = drawable.getIntrinsicWidth();
         int h = drawable.getIntrinsicHeight();
@@ -23,4 +29,18 @@ public class MyUtils {
 
         return bitmap;
     }
+
+    /**
+     * check Internet connect
+     */
+    public static boolean isInternetConnected(Context context){
+        if(context != null){
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if(networkInfo != null)
+                return networkInfo.isAvailable();
+        }
+        return false;
+    }
+
 }
