@@ -1,15 +1,16 @@
 # Default use of database for DailyNUS:
 # MySQL is adapted as the official database for DailyNUS.
+# It is recommended that you do not choose a different database provider.
 
 default: &default
   adapter: mysql
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: 5
   timeout: 5000
 
   # Notice that you need to change the setting below to fit your
   # database connection information.
-  username: orbital
-  password:
+  username: 
+  password: 
 
 development:
   <<: *default
