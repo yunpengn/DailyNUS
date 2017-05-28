@@ -2,12 +2,12 @@
 
 * System dependencies
 - Ruby 2.3.3
-- Ruby on Rails 5.1.1
+- [Ruby on Rails](http://rubyonrails.org/) 5.1.1
 
 * Configuration
 
 * Database creation
-Notice that for android branch, the following back-end frameworks are used:<br>
+Notice that for __android__ branch, the following back-end frameworks are used:<br>
 spring + springmvc + mybatis + shiro
 
 * Database initialization
