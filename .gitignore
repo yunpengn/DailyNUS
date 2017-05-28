@@ -23,4 +23,4 @@
 .byebug_history
 
 # Ignore the database connection information
-config/database.yml
+database.yml
