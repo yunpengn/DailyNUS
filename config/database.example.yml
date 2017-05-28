@@ -1,3 +1,9 @@
+######################################################################
+# Notice this file is an example to tell you how to config the connection
+# for databases. You should rename it to database.yml and change the 
+# required information below.
+######################################################################
+
 # Default use of database for DailyNUS:
 # MySQL is adapted as the official database for DailyNUS.
 # It is recommended that you do not choose a different database provider.
@@ -10,7 +16,7 @@ default: &default
 
   # Notice that you need to change the setting below to fit your
   # database connection information.
-  username: root
+  username: 
   password: 
 
 development:
