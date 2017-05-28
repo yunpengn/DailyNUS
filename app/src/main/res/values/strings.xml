@@ -4,14 +4,21 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!-- title for activity -->
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_signup">SignUp</string>
+    <string name="title_activity_form">FormActivity</string>
 
+    <!-- menu title-->
     <string name="action_menu_theme">Theme</string>
     <string name="action_menu_settings">Settings</string>
     <string name="action_menu_person_detail"></string>
     <string name="title_activity_login">Sign in</string>
+    <string name="action_menu_done">done</string>
 
-    <string name="username_filter">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.()</string>
+    <!-- input filter-->
+    <string name="username_filter">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.</string>
     <string name="password_filter">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$+*.()</string>
+
 </resources>

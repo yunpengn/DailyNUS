@@ -62,7 +62,7 @@ public class DesEncryption {
             SecretKey secretKey = generateSecretKey();
             Cipher desCipher = Cipher.getInstance("DESede");
 
-            byte[] content = Base64.decodeBase64(decryStr);
+            byte[] content = Base64.decodeBase64(decryStr.getBytes());
 
             desCipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] textDncryted = desCipher.doFinal(content);

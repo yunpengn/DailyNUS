@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#eee"
+    android:orientation="vertical"
+    tools:context="ind.hailin.dailynus.activity.FormActivity"
+    tools:showIn="@layout/activity_user_info">
+
+    <RelativeLayout
+        style="@style/style_userinfo_layout"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Gender" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Birthday" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="E-mail" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout
+        style="@style/style_userinfo_layout"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Major" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Faculty" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Courses" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="10dp"
+        android:text="Optional"
+        android:textColor="#aaa"
+        android:textSize="16sp" />
+
+    <RelativeLayout
+        style="@style/style_userinfo_layout"
+        android:layout_marginTop="2dp">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="First Name" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout
+        style="@style/style_userinfo_layout"
+        android:layout_marginTop="2dp">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Last Name" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Phone Number" />
+
+        <TextView style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+
+</LinearLayout>
+

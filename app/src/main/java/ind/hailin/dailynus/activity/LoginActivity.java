@@ -1,28 +1,79 @@
 package ind.hailin.dailynus.activity;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import ind.hailin.dailynus.R;
+import java.io.UnsupportedEncodingException;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+import ind.hailin.dailynus.R;
+import ind.hailin.dailynus.exception.DesException;
+import ind.hailin.dailynus.utils.Constants;
+import ind.hailin.dailynus.utils.DesEncryption;
+import ind.hailin.dailynus.web.LoginManager;
+
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+    public static final String TAG = "LoginActivity";
+
+    private SharedPreferences sp;
+    private LoginManager loginManager;
 
     private EditText etUsername, etPassword;
     private CheckBox checkBox;
     private Button btnLogin;
     private TextView tvForgort, tvSignup;
 
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constants.LOGIN_SUCCESS:
+                    String requestBody = (String) msg.obj;
+                    storeUsernameAndPassword(requestBody);
+
+                    queryUserData(requestBody);
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                    break;
+                case Constants.LOGIN_AUTHENTICATION_ERROR:
+                    Snackbar.make(getWindow().getDecorView(), "Sorry, wrong username/password", Snackbar.LENGTH_LONG).show();
+                    clearStoredUsernameAndPassword();
+                    break;
+                case Constants.LOGIN_EXCEPTION:
+                    Snackbar.make(getWindow().getDecorView(), "Sorry, there are some small problems, please try again", Snackbar.LENGTH_LONG).show();
+                    clearStoredUsernameAndPassword();
+                    break;
+                case Constants.NO_INTERNET_CONNECTION:
+                    Snackbar.make(getWindow().getDecorView(), "Please connect to the Internet", Snackbar.LENGTH_LONG).show();
+                    break;
+                case Constants.SERVER_ERROR:
+                    Snackbar.make(getWindow().getDecorView(), "Sorry, our server is in maintenance, please try later", Snackbar.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        sp = getSharedPreferences("config", Context.MODE_PRIVATE);
         initView();
     }
 
@@ -41,15 +92,95 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.login_btn_login:
+                // check the validity of username and password
+                String inputUsername = etUsername.getText().toString().trim();
+                String inputPassword = etPassword.getText().toString().trim();
+
+                if (inputUsername == null || inputUsername.isEmpty()){
+                    Snackbar.make(getWindow().getDecorView(), "Please enter username", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inputPassword == null || inputPassword.isEmpty()){
+                    Snackbar.make(getWindow().getDecorView(), "Please enter password", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inputUsername.length() > 18) {
+                    Snackbar.make(getWindow().getDecorView(), "Sorry, username too long", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inputPassword.length() > 16) {
+                    Snackbar.make(getWindow().getDecorView(), "Sorry, password too long", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (checkBox.isChecked()) { /*use nus email*/
+                    if (!inputUsername.endsWith("@u.nus.edu")) {
+                        Snackbar.make(getWindow().getDecorView(), "Sorry, invalid nus email address", Snackbar.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        // Login with NUS email (identify by NUS api)
+                    }
+                }
+                // login use my own server
+                loginManager = new LoginManager();
+                loginManager.queryLogin(this, handler, inputUsername, inputPassword, false);
                 break;
             case R.id.login_tv_forgot:
-                Snackbar.make(getWindow().getDecorView(),"Sorry, this function does not finish yet", Snackbar.LENGTH_SHORT);
+                Snackbar.make(getWindow().getDecorView(), "Sorry, this function does not finish yet", Snackbar.LENGTH_SHORT).show();
                 break;
             case R.id.login_tv_signup:
-                //TODO
+                startActivity(new Intent(this, SignupActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
         }
+    }
+
+    /**
+     * EditText loses its focus when touching outside
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    private void queryUserData(String requestBody) {
+        //TODO
+    }
+
+    private void storeUsernameAndPassword(String requestBody){
+        try {
+            String storedUsername = requestBody.substring(0, requestBody.indexOf(":"));
+            String storedPassword = requestBody.substring(requestBody.indexOf(":") + 1);
+            storedPassword = new String(DesEncryption.encryption(storedPassword), "utf-8");
+            sp.edit().putString("username", storedUsername)
+                    .putString("password", storedPassword)
+                    .apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "store username and password error");
+        }
+    }
+
+    private void clearStoredUsernameAndPassword(){
+        sp.edit().remove("username").remove("password").apply();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //if(loginManager!=null)loginManager.stop();
     }
 }
