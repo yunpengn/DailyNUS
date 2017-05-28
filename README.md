@@ -1,8 +1,9 @@
 # DailyNUS
 
-* System dependencies
+## System dependencies
 - Ruby 2.3.3
 - [Ruby on Rails](http://rubyonrails.org/) 5.1.1
+- [mysql2](https://github.com/brianmario/mysql2)
 
 * Configuration
 
