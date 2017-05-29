@@ -10,71 +10,96 @@
     tools:showIn="@layout/activity_user_info">
 
     <RelativeLayout
+        android:id="@+id/userinfo_username"
         style="@style/style_userinfo_layout"
         android:layout_marginTop="8dp">
 
         <TextView
             style="@style/style_userinfo_tv_left"
-            android:text="Gender" />
-
-        <TextView style="@style/style_userinfo_tv_right" />
-    </RelativeLayout>
-
-    <ImageView style="@style/style_cuttingline" />
-
-    <RelativeLayout style="@style/style_userinfo_layout">
+            android:text="Username" />
 
         <TextView
-            style="@style/style_userinfo_tv_left"
-            android:text="Birthday" />
-
-        <TextView style="@style/style_userinfo_tv_right" />
-    </RelativeLayout>
-
-    <ImageView style="@style/style_cuttingline" />
-
-    <RelativeLayout style="@style/style_userinfo_layout">
-
-        <TextView
-            style="@style/style_userinfo_tv_left"
-            android:text="E-mail" />
-
-        <TextView style="@style/style_userinfo_tv_right" />
+            android:id="@+id/userinfo_tv_username"
+            style="@style/style_userinfo_tv_right" />
     </RelativeLayout>
 
     <ImageView style="@style/style_cuttingline" />
 
     <RelativeLayout
+        android:id="@+id/userinfo_gender"
+        style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Gender" />
+
+        <TextView
+            android:id="@+id/userinfo_tv_gender"
+            style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout
+        android:id="@+id/userinfo_birthday"
+        style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="Birthday" />
+
+        <TextView
+            android:id="@+id/userinfo_tv_birthday"
+            style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+    <RelativeLayout
+        android:id="@+id/userinfo_email"
+        style="@style/style_userinfo_layout">
+
+        <TextView
+            style="@style/style_userinfo_tv_left"
+            android:text="E-mail" />
+
+        <TextView
+            android:id="@+id/userinfo_tv_email"
+            style="@style/style_userinfo_tv_right" />
+    </RelativeLayout>
+
+    <ImageView style="@style/style_cuttingline" />
+
+
+    <RelativeLayout
+        android:id="@+id/userinfo_faculty"
         style="@style/style_userinfo_layout"
         android:layout_marginTop="8dp">
 
         <TextView
             style="@style/style_userinfo_tv_left"
-            android:text="Major" />
-
-        <TextView style="@style/style_userinfo_tv_right" />
-    </RelativeLayout>
-
-    <ImageView style="@style/style_cuttingline" />
-
-    <RelativeLayout style="@style/style_userinfo_layout">
-
-        <TextView
-            style="@style/style_userinfo_tv_left"
             android:text="Faculty" />
 
-        <TextView style="@style/style_userinfo_tv_right" />
+        <TextView
+            android:id="@+id/userinfo_tv_faculty"
+            style="@style/style_userinfo_tv_right"
+            />
     </RelativeLayout>
+
 
     <ImageView style="@style/style_cuttingline" />
 
-    <RelativeLayout style="@style/style_userinfo_layout">
+    <RelativeLayout
+        android:id="@+id/userinfo_major"
+        style="@style/style_userinfo_layout">
 
         <TextView
             style="@style/style_userinfo_tv_left"
-            android:text="Courses" />
+            android:text="Major" />
 
-        <TextView style="@style/style_userinfo_tv_right" />
+        <TextView
+            android:id="@+id/userinfo_tv_major"
+            style="@style/style_userinfo_tv_right" />
     </RelativeLayout>
 
     <ImageView style="@style/style_cuttingline" />
@@ -89,6 +114,7 @@
         android:textSize="16sp" />
 
     <RelativeLayout
+        android:id="@+id/userinfo_firstname"
         style="@style/style_userinfo_layout"
         android:layout_marginTop="2dp">
 
@@ -96,12 +122,15 @@
             style="@style/style_userinfo_tv_left"
             android:text="First Name" />
 
-        <TextView style="@style/style_userinfo_tv_right" />
+        <TextView
+            android:id="@+id/userinfo_tv_firstname"
+            style="@style/style_userinfo_tv_right" />
     </RelativeLayout>
 
     <ImageView style="@style/style_cuttingline" />
 
     <RelativeLayout
+        android:id="@+id/userinfo_lastname"
         style="@style/style_userinfo_layout"
         android:layout_marginTop="2dp">
 
@@ -109,18 +138,24 @@
             style="@style/style_userinfo_tv_left"
             android:text="Last Name" />
 
-        <TextView style="@style/style_userinfo_tv_right" />
+        <TextView
+            android:id="@+id/userinfo_tv_lastname"
+            style="@style/style_userinfo_tv_right" />
     </RelativeLayout>
 
     <ImageView style="@style/style_cuttingline" />
 
-    <RelativeLayout style="@style/style_userinfo_layout">
+    <RelativeLayout
+        android:id="@+id/userinfo_phone"
+        style="@style/style_userinfo_layout">
 
         <TextView
             style="@style/style_userinfo_tv_left"
             android:text="Phone Number" />
 
-        <TextView style="@style/style_userinfo_tv_right" />
+        <TextView
+            android:id="@+id/userinfo_tv_phone"
+            style="@style/style_userinfo_tv_right" />
     </RelativeLayout>
 
     <ImageView style="@style/style_cuttingline" />

@@ -20,5 +20,6 @@
     <!-- input filter-->
     <string name="username_filter">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.</string>
     <string name="password_filter">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$+*.()</string>
+    <string name="title_activity_courses">Courses</string>
 
 </resources>

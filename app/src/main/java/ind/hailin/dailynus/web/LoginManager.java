@@ -1,16 +1,13 @@
 package ind.hailin.dailynus.web;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.Snackbar;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import ind.hailin.dailynus.application.DataApplication;
 import ind.hailin.dailynus.exception.DesException;
@@ -66,7 +63,7 @@ public class LoginManager {
 
     public void stop(){
         if(thread != null && thread.isAlive())
-            MyHttpPost.disconnect(loginRunnable.getConn());
+            MyHttpMethods.disconnect(loginRunnable.getConn());
     }
 
     private void handleException(Handler handler) {
@@ -96,12 +93,12 @@ public class LoginManager {
             try {
                 url = new URL(urlString);
                 conn = (HttpURLConnection) url.openConnection();
-                MyHttpPost.setRequest(conn);
-                MyHttpPost.writeToServer(conn, DesEncryption.encryption(requestBody));
+                MyHttpMethods.setPostRequest(conn);
+                MyHttpMethods.writeToServer(conn, DesEncryption.encryption(requestBody));
 
                 int code = conn.getResponseCode();
                 if (code == 200) {
-                    String result = MyHttpPost.readFromServer(conn);
+                    String result = MyHttpMethods.readFromServer(conn);
 
                     if (result.equals("AuthenticationException")) {
                         message.what = Constants.LOGIN_AUTHENTICATION_ERROR;
@@ -124,7 +121,7 @@ public class LoginManager {
                 e.printStackTrace();
                 message.what = Constants.LOGIN_EXCEPTION;
             } finally {
-                MyHttpPost.disconnect(conn);
+                MyHttpMethods.disconnect(conn);
                 handler.sendMessage(message);
             }
         }

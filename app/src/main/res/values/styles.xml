@@ -40,17 +40,19 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_alignParentLeft">true</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:gravity">center</item>
     </style>
 
     <style name="style_userinfo_tv_right">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">230dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_alignParentRight">true</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:gravity">center</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">right|center_vertical</item>
         <item name="android:drawableRight">@drawable/ic_chevron_right_grey_24dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="style_cuttingline">

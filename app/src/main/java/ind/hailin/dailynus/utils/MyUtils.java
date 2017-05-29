@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.util.Calendar;
+
 /**
  * Created by hailin on 2017/5/15.
  */
@@ -33,14 +35,28 @@ public class MyUtils {
     /**
      * check Internet connect
      */
-    public static boolean isInternetConnected(Context context){
-        if(context != null){
+    public static boolean isInternetConnected(Context context) {
+        if (context != null) {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            if(networkInfo != null)
+            if (networkInfo != null)
                 return networkInfo.isAvailable();
         }
         return false;
+    }
+
+    /**
+     * check date validity
+     */
+    public static boolean isDateValid(int year, int month, int dayOfMonth) {
+        Calendar calendar = Calendar.getInstance();
+        if (year > calendar.get(Calendar.YEAR))
+            return false;
+        if (year == calendar.get(Calendar.YEAR) && month > calendar.get(Calendar.MONTH))
+            return false;
+        if (year == calendar.get(Calendar.YEAR) && month == calendar.get(Calendar.MONTH) && dayOfMonth > calendar.get(Calendar.DAY_OF_MONTH))
+            return false;
+        return true;
     }
 
 }

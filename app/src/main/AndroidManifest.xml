@@ -43,6 +43,10 @@
         <activity
             android:name=".activity.FormActivity"
             android:label="@string/title_activity_form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.CoursesActivity"
+            android:label="@string/title_activity_courses"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

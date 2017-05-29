@@ -5,31 +5,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import ind.hailin.dailynus.R;
+import ind.hailin.dailynus.entity.Users;
 
-public class FormActivity extends AppCompatActivity {
+public class FormActivity extends AbstractUserInfoActivity{
+    public static final  String TAG = "FormActivity";
 
-    private String inputUsername;
-    private String inputPassword;
-    private String inputNickname;
+    private String inputUsername, inputPassword, inputNickname;
+    private Users mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_info);
 
         initDataFromIntent();
-        initToolBar();
-
+        initUser();
+        super.initToolBar(inputNickname);
+        this.initView();
     }
 
     private void initDataFromIntent() {
@@ -39,62 +40,31 @@ public class FormActivity extends AppCompatActivity {
         inputNickname = signupIntent.getStringExtra("name");
     }
 
-    private void initToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    private void initUser(){
+        mUser = new Users();
+        mUser.setUsername(inputUsername);
+        mUser.setPassword(inputPassword);
+        mUser.setNickName(inputNickname);
+        super.setUser(mUser);
+    }
 
-        try {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }catch (Exception e){
-            e.printStackTrace();
+    @Override
+    protected void initView() {
+        super.initView();
+        tvUsername.setText(inputUsername);
+        if(mUser.getUsername().contains("@")){
+            tvEmail.setText(mUser.getUsername());
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(FormActivity.this);
-                builder.setMessage("You may lose your setting");
-                builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        dialog.dismiss();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
-            }
-        });
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.userinfo_collapsingtoolbarlayout);
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.userinfo_appbarlayout);
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
+    }
 
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbarLayout.setTitle("inputNickname");
-                    isShow = true;
-                } else if(isShow) {
-                    collapsingToolbarLayout.setTitle(" ");
-                    isShow = false;
-                }
-            }
-        });
+    @Override
+    public void onClick(View v) {
+        super.doOnClick(v);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_signup, menu);
+        getMenuInflater().inflate(R.menu.menu_done, menu);
         return true;
     }
 
@@ -107,4 +77,5 @@ public class FormActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
