@@ -1,7 +1,7 @@
 package ind.hailin.dailynus.utils;
 
 
-import org.apache.commons.codec.binary.Base64;
+import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -38,7 +38,7 @@ public class DesEncryption {
             desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] textEncryted = desCipher.doFinal(content);
 
-            return Base64.encodeBase64(textEncryted);
+            return Base64.encode(textEncryted, Base64.DEFAULT);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
@@ -62,7 +62,7 @@ public class DesEncryption {
             SecretKey secretKey = generateSecretKey();
             Cipher desCipher = Cipher.getInstance("DESede");
 
-            byte[] content = Base64.decodeBase64(decryStr.getBytes());
+            byte[] content = Base64.decode(decryStr.getBytes(), Base64.DEFAULT);
 
             desCipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] textDncryted = desCipher.doFinal(content);

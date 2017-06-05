@@ -1,9 +1,12 @@
 package ind.hailin.dailynus.activity;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.Context;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,70 +19,133 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import ind.hailin.dailynus.R;
+import ind.hailin.dailynus.application.DataApplication;
 import ind.hailin.dailynus.entity.Users;
+import ind.hailin.dailynus.fragment.LoadingPageFragment;
+import ind.hailin.dailynus.fragment.UserInfoFragment;
+import ind.hailin.dailynus.handler.QueryJsonHandler;
+import ind.hailin.dailynus.handler.UploadHandler;
+import ind.hailin.dailynus.utils.CacheUtils;
 import ind.hailin.dailynus.utils.Constants;
 import ind.hailin.dailynus.utils.MyJsonParsers;
-import ind.hailin.dailynus.utils.MyUtils;
+import ind.hailin.dailynus.utils.MyPicUtils;
 import ind.hailin.dailynus.web.QueryJsonManager;
+import ind.hailin.dailynus.web.UploadManager;
 
 /**
  * Created by hailin on 2017/5/29.
+ * Abstract activity for FormActivity and ProfileActivity
  */
 
-public abstract class AbstractUserInfoActivity extends AppCompatActivity implements View.OnClickListener {
+public abstract class AbstractUserInfoActivity extends AppCompatActivity implements View.OnClickListener,
+        LoadingPageFragment.OnFragmentInteractionListener, UserInfoFragment.OnProfileChangeListener {
     public static final String TAG = "Abs_UserInfoActivity";
 
-    protected ImageView ivAvatar;
-    protected TextView tvNickname;
-    protected TextView tvUsername, tvGender, tvBirthday, tvEmail;
-    protected TextView tvFaculty, tvMajor;
-    protected TextView tvFirstname, tvLastname, tvPhone;
+    private FragmentManager fragmentManager;
+    private QueryJsonManager queryFacultyMajor, queryAvatar;
+    private UploadManager uploadUserManager;
 
-    private Users user;
-    private int handler_flag;
+    private ImageView ivAvatar;
+    private TextView tvNickname;
 
-    protected Map<String, List<String>> facultyMajorMap;
+    private Map<String, List<String>> facultyMajorMap;
+    protected String userUnchanged;
+    protected boolean isProfileChange;
 
-    protected final Handler handler = new Handler() {
+    private Handler facultyMajorHandler = new QueryJsonHandler() {
         @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Constants.JSON_QUERY_SUCCESS:
-                    Log.d(TAG, "get facultyMajorMap");
-                    facultyMajorMap = (Map<String, List<String>>) msg.obj;
-                    Log.d(TAG, facultyMajorMap.toString());
-                    dialogWithActv();
-                    break;
-                case Constants.NO_INTERNET_CONNECTION:
-                    Snackbar.make(getWindow().getDecorView(), "Please connect to the Internet", Snackbar.LENGTH_LONG).show();
-                    break;
-                case Constants.NO_JSON_RETURN:
-                case Constants.TARGET_SERVER_ERROR:
-                case Constants.JSON_QUERY_EXCEPTION:
-                case Constants.JSON_QUERY_URL_ERROR:
-                    Snackbar.make(getWindow().getDecorView(), "Sorry, our server is in maintenance, please try later", Snackbar.LENGTH_LONG).show();
-                    break;
+        public void success(Message msg) {
+            InputStream inputStream = (InputStream) msg.obj;
+            try {
+                facultyMajorMap = MyJsonParsers.getFacultyMajor(inputStream);
+                Log.d(TAG, facultyMajorMap.toString());
+
+                showUserInfoFragment();
+            } catch (IOException e) {
+                e.printStackTrace();
+                failure(msg);
+            } finally {
+                try {
+                    if (inputStream != null)
+                        inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        }
+
+        @Override
+        public void failure(Message msg) {
+            String checkStringFaculty = DataApplication.getApplication().getUser().getFaculty();
+            if (checkStringFaculty != null && !checkStringFaculty.isEmpty()) {
+                showUserInfoFragment();
+            } else {
+                Snackbar.make(getWindow().getDecorView(), "Sorry, there are some small problems, please try again", Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    private Handler avatarHandler = new QueryJsonHandler() {
+        @Override
+        public void success(Message msg) {
+            InputStream inputStream = null;
+            ByteArrayOutputStream outputStream = null;
+            try {
+                inputStream = (InputStream) msg.obj;
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                outputStream = MyPicUtils.convertBitmapToOutputStream(bitmap);
+                CacheUtils.cacheAvatarById(AbstractUserInfoActivity.this,
+                        DataApplication.getApplication().getUser().getId(), outputStream.toByteArray());
+                ivAvatar.setImageBitmap(MyPicUtils.getCroppedBitmap(bitmap));
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (inputStream != null)
+                        inputStream.close();
+                    if (outputStream != null)
+                        outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void failure(Message msg) {
+        }
+    };
+
+    private Handler uploadUserHandler = new UploadHandler() {
+        @Override
+        public void success(Message msg) {
+            if (AbstractUserInfoActivity.this instanceof FormActivity){
+                startActivity(new Intent(AbstractUserInfoActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                finish();
+            } else {
+                Toast.makeText(AbstractUserInfoActivity.this, "update success", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
+        @Override
+        public void failure(Message msg) {
+            Snackbar.make(getWindow().getDecorView(), "Sorry, there are some small problems, please try again", Snackbar.LENGTH_LONG).show();
+            closeUploadingFragment();
         }
     };
 
@@ -87,9 +153,17 @@ public abstract class AbstractUserInfoActivity extends AppCompatActivity impleme
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
+
+        userUnchanged = DataApplication.getApplication().getUser().toString();
+        isProfileChange = false;
+
+        initHttpManager();
+        initToolBar();
+        initView();
+        initFragment();
     }
 
-    protected void initToolBar(final String inputNickname) {
+    private void initToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -102,22 +176,15 @@ public abstract class AbstractUserInfoActivity extends AppCompatActivity impleme
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AbstractUserInfoActivity.this);
-                builder.setMessage("You may lose your setting");
-                builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        dialog.dismiss();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.show();
+                if (AbstractUserInfoActivity.this instanceof ProfileActivity && isProfileChange){
+                    setResult(Constants.RESULT_PROFILE_TO_HOME_CHANGE);
+                }
+                Users curUser = DataApplication.getApplication().getUser();
+                if (curUser.toString().equals(userUnchanged)) { /*nothing changed*/
+                    finish();
+                } else {
+                    goBackDialog();
+                }
             }
         });
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.userinfo_collapsingtoolbarlayout);
@@ -132,7 +199,8 @@ public abstract class AbstractUserInfoActivity extends AppCompatActivity impleme
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbarLayout.setTitle(inputNickname);
+                    String nickname = DataApplication.getApplication().getUser().getNickName();
+                    collapsingToolbarLayout.setTitle(nickname);
                     isShow = true;
                 } else if (isShow) {
                     collapsingToolbarLayout.setTitle(" ");
@@ -142,218 +210,162 @@ public abstract class AbstractUserInfoActivity extends AppCompatActivity impleme
         });
     }
 
-    protected void initView() {
+    private void initView() {
         ivAvatar = (ImageView) findViewById(R.id.userinfo_avatar);
         tvNickname = (TextView) findViewById(R.id.userinfo_nickname);
+        avatarIvLoadPic();
+        tvNickname.setText(DataApplication.getApplication().getUser().getNickName());
 
-        findViewById(R.id.userinfo_username).setOnClickListener(this);
-        findViewById(R.id.userinfo_gender).setOnClickListener(this);
-        findViewById(R.id.userinfo_birthday).setOnClickListener(this);
-        findViewById(R.id.userinfo_email).setOnClickListener(this);
-        findViewById(R.id.userinfo_faculty).setOnClickListener(this);
-        findViewById(R.id.userinfo_major).setOnClickListener(this);
-        findViewById(R.id.userinfo_firstname).setOnClickListener(this);
-        findViewById(R.id.userinfo_lastname).setOnClickListener(this);
-        findViewById(R.id.userinfo_phone).setOnClickListener(this);
-
-        tvUsername = (TextView) findViewById(R.id.userinfo_tv_username);
-        tvGender = (TextView) findViewById(R.id.userinfo_tv_gender);
-        tvBirthday = (TextView) findViewById(R.id.userinfo_tv_birthday);
-        tvEmail = (TextView) findViewById(R.id.userinfo_tv_email);
-        tvMajor = (TextView) findViewById(R.id.userinfo_tv_major);
-        tvFaculty = (TextView) findViewById(R.id.userinfo_tv_faculty);
-        tvFirstname = (TextView) findViewById(R.id.userinfo_tv_firstname);
-        tvLastname = (TextView) findViewById(R.id.userinfo_tv_lastname);
-        tvPhone = (TextView) findViewById(R.id.userinfo_tv_phone);
+        ivAvatar.setOnClickListener(this);
+//        tvNickname.setOnClickListener(this); // nickname cannot be changed
     }
 
-    protected void doOnClick(View v) {
+    private void initHttpManager() {
+        queryFacultyMajor = new QueryJsonManager(3000, Constants.JSON_TYPE_FACULTY_MAJOR);
+        queryAvatar = new QueryJsonManager(3000, Constants.JSON_TYPE_USER);
+
+        uploadUserManager = new UploadManager(Constants.UPLOAD_TYPE_USER);
+    }
+
+    private void initFragment() {
+        fragmentManager = getFragmentManager();
+
+        LoadingPageFragment loadingPageFragment = LoadingPageFragment.newInstance();
+        loadingPageFragment.setOnFragmentInteractionListener(this, Constants.ACTION_DOWNLOAD);
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.userinfo_fragment_container, loadingPageFragment, LoadingPageFragment.TAG);
+        fragmentTransaction.commit();
+    }
+
+    private void goBackDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AbstractUserInfoActivity.this);
+        builder.setMessage("You may lose your setting");
+        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.userinfo_username:
+            case R.id.userinfo_avatar:
+                startActivityForResult(new Intent(this, AvatarActivity.class), Constants.REQUEST_USERINFO_TO_AVATAR);
                 break;
-            case R.id.userinfo_gender:
-                int checkedItem = -1;
-                if (user.getGender() != null) { /*change default choose*/
-                    if (user.getGender().equals(Constants.gender_choice[0]))
-                        checkedItem = 0;
-                    else checkedItem = 1;
-                }
-                AlertDialog.Builder genderBuilder = new AlertDialog.Builder(this);
-                genderBuilder.setSingleChoiceItems(Constants.gender_choice, checkedItem, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        user.setGender(Constants.gender_choice[which]);
-                        tvGender.setText(Constants.gender_choice[which]);
-                        dialog.dismiss();
-                    }
-                });
-                genderBuilder.show();
-                break;
-            case R.id.userinfo_birthday:
-                Calendar calendar = Calendar.getInstance();
-                Date date = user.getBirthday();
-                if (date != null)
-                    calendar.setTime(date);
+//            case R.id.userinfo_nickname:
+//                dialogWithEditText();
+//                isProfileChange = true;
+//                break;
+        }
+    }
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        if (!MyUtils.isDateValid(year, month, dayOfMonth)) {
-                            Snackbar.make(getWindow().getDecorView(), "Date is invalid", Snackbar.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        int realMonth = month + 1; // java's month starts from 0
-                        try {
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
-                            Date pickedDate = dateFormat.parse(year + "." + realMonth + "." + dayOfMonth);
-                            user.setBirthday(pickedDate);
-                            SimpleDateFormat sgFormat = new SimpleDateFormat("dd-MM-yyyy");
-                            tvBirthday.setText(sgFormat.format(pickedDate));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show();
+    @Override
+    public void onFragmentInteraction(int actionCode) {
+        switch (actionCode) {
+            case Constants.ACTION_DOWNLOAD:
+                queryFacultyMajor.query(this, facultyMajorHandler);
                 break;
-            case R.id.userinfo_email:
-                EditText etEmail = new EditText(this);
-                etEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                etEmail.setText(tvEmail.getText() != null ? tvEmail.getText() : "");
-                dialogWithEditText(etEmail, v.getId(), "E-mail");
-                break;
-            case R.id.userinfo_firstname:
-                EditText etFirstname = new EditText(this);
-                etFirstname.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                dialogWithEditText(etFirstname, v.getId(), "First Name");
-                break;
-            case R.id.userinfo_lastname:
-                EditText etLastname = new EditText(this);
-                etLastname.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                dialogWithEditText(etLastname, v.getId(), "Last Name");
-                break;
-            case R.id.userinfo_phone:
-                EditText etPhone = new EditText(this);
-                etPhone.setInputType(InputType.TYPE_CLASS_NUMBER);
-                dialogWithEditText(etPhone, v.getId(), "Phone Number");
-                break;
-            case R.id.userinfo_faculty:
-            case R.id.userinfo_major:
-                handler_flag = v.getId();
-                queryFacultyDepartments();
+            case Constants.ACTION_UPLOAD:
+                Users user = DataApplication.getApplication().getUser();
+                uploadUserManager.queryUploadObject(this, uploadUserHandler, user.getUsername(), user);
                 break;
         }
     }
 
-    private void dialogWithEditText(final EditText editText, final int viewId, String titleName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(titleName);
-        builder.setView(editText);
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String inputString = editText.getText().toString();
-                switch (viewId) {
-                    case R.id.userinfo_email:
-                        user.setEmail(inputString);
-                        tvEmail.setText(inputString);
-                        break;
-                    case R.id.userinfo_firstname:
-                        user.setFirstName(inputString);
-                        tvFirstname.setText(inputString);
-                        break;
-                    case R.id.userinfo_lastname:
-                        user.setLastName(inputString);
-                        tvLastname.setText(inputString);
-                        break;
-                    case R.id.userinfo_phone:
-                        user.setPhone(inputString);
-                        tvPhone.setText(inputString);
-                        break;
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+    public void showUserInfoFragment() {
+        Fragment fragment = fragmentManager.findFragmentByTag(LoadingPageFragment.TAG);
+        UserInfoFragment userInfoFragment = UserInfoFragment.newInstance();
+        userInfoFragment.setFacultyMajorMap(facultyMajorMap);
+        userInfoFragment.setOnProfileChangeListener(this);
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(fragment);
+        fragmentTransaction.add(R.id.userinfo_fragment_container, userInfoFragment, UserInfoFragment.TAG);
+        fragmentTransaction.commit();
     }
 
-    private void queryFacultyDepartments() {
-        if (facultyMajorMap != null) {
-            dialogWithActv();
-        } else {
-            QueryJsonManager queryJsonManager = new QueryJsonManager(2000, Constants.JSON_TYPE_FACULTY_MAJOR);
-            queryJsonManager.queryFacultyDepartments(this, handler);
+    private void avatarIvLoadPic() {
+        try {
+            Bitmap bitmap = CacheUtils.getAvatarFromCache(this);
+            ivAvatar.setImageBitmap(MyPicUtils.getCroppedBitmap(bitmap));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Users user = DataApplication.getApplication().getUser();
+            queryAvatar.query(this, avatarHandler, user.getUsername(), "avatar.png");
         }
     }
 
-    private void dialogWithActv() {
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actvLayout = layoutInflater.inflate(R.layout.dialog_item_actv, null);
-        final AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) actvLayout.findViewById(R.id.dialog_item_actv);
+//    private void dialogWithEditText() {
+//        final EditText etNickname = new EditText(this);
+//        etNickname.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Nickname");
+//        builder.setView(etNickname);
+//        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                String nickname = etNickname.getText().toString();
+//
+//                Users user = DataApplication.getApplication().getUser();
+//                user.setNickName(nickname);
+//                DataApplication.getApplication().setUser(user);
+//
+//                tvNickname.setText(nickname);
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.show();
+//    }
 
-        String[] dataArray = null;
-        String dialog_title = null;
-        if (handler_flag == R.id.userinfo_faculty) {
-            Set<String> keySet = facultyMajorMap.keySet();
-            dataArray = keySet.toArray(new String[keySet.size()]);
-            dialog_title = "Faculty";
-        } else if (handler_flag == R.id.userinfo_major) {
-            if (user.getFaculty() == null || user.getFaculty().isEmpty()) {
-                Snackbar.make(getWindow().getDecorView(), "Please enter faculty first", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
-            List<String> majorList = facultyMajorMap.get(user.getFaculty());
-            dataArray = majorList.toArray(new String[majorList.size()]);
-            dialog_title = "Major";
-        }
+    protected void uploadUser() {
+        LoadingPageFragment loadingPageFragment = LoadingPageFragment.newInstance();
+        loadingPageFragment.setStyle(LoadingPageFragment.STYLE_TRANSPARENT);
+        loadingPageFragment.setOnFragmentInteractionListener(this, Constants.ACTION_UPLOAD);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, dataArray);
-        autoCompleteTextView.setAdapter(adapter);
-        autoCompleteTextView.setThreshold(1);
-        autoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    ((AutoCompleteTextView) v).showDropDown();
-                }
-            }
-        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(dialog_title);
-        builder.setView(actvLayout);
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (handler_flag == R.id.userinfo_faculty) {
-                    String facultyName = autoCompleteTextView.getText().toString().trim();
-                    user.setFaculty(facultyName);
-                    tvFaculty.setText(facultyName);
-                } else {
-                    String majorName = autoCompleteTextView.getText().toString().trim();
-                    user.setMajor(majorName);
-                    tvMajor.setText(majorName);
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.userinfo_fragment_loading_container,
+                loadingPageFragment, LoadingPageFragment.TAG_TRANSPARENT);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
-    protected void setUser(Users user) {
-        this.user = user;
+    private void closeUploadingFragment() {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(fragmentManager.findFragmentByTag(LoadingPageFragment.TAG_TRANSPARENT));
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.REQUEST_USERINFO_TO_AVATAR) {
+            int resultFlag = data.getIntExtra("resultFlag", Constants.CROP_NO_CHANGE);
+            if (resultFlag == Constants.CROP_AND_UPLOAD_SUCCESS) {
+                avatarIvLoadPic();
+                isProfileChange = true;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

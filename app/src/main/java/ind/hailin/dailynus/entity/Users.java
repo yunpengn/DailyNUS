@@ -3,6 +3,8 @@ package ind.hailin.dailynus.entity;
 import java.util.Date;
 
 public class Users {
+    private Integer id;
+
     private String username;
 
     private String password;
@@ -24,6 +26,22 @@ public class Users {
     private String faculty;
 
     private String major;
+
+    private String course;
+
+    private Date updatedAt;
+
+    private String bak1;
+
+    private String bak2;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -113,4 +131,57 @@ public class Users {
         this.major = major == null ? null : major.trim();
     }
 
+    public String getCourse() {
+        return course;
+    }
+
+    public void setCourse(String course) {
+        this.course = course == null ? null : course.trim();
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getBak1() {
+        return bak1;
+    }
+
+    public void setBak1(String bak1) {
+        this.bak1 = bak1 == null ? null : bak1.trim();
+    }
+
+    public String getBak2() {
+        return bak2;
+    }
+
+    public void setBak2(String bak2) {
+        this.bak2 = bak2 == null ? null : bak2.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "Users{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", birthday=" + birthday +
+                ", gender='" + gender + '\'' +
+                ", faculty='" + faculty + '\'' +
+                ", major='" + major + '\'' +
+                ", course='" + course + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", bak1='" + bak1 + '\'' +
+                ", bak2='" + bak2 + '\'' +
+                '}';
+    }
 }

@@ -29,6 +29,9 @@ public class LoginManager {
     }
 
     public void queryLogin(Activity activity, Handler handler, String username, String password, boolean isEncrypted) {
+        if (thread != null && thread.isAlive()) {
+            return;
+        }
         if (!MyUtils.isInternetConnected(activity)) {
             Message message = Message.obtain();
             message.what = Constants.NO_INTERNET_CONNECTION;
@@ -61,8 +64,8 @@ public class LoginManager {
         thread.start();
     }
 
-    public void stop(){
-        if(thread != null && thread.isAlive())
+    public void stop() {
+        if (thread != null && thread.isAlive())
             MyHttpMethods.disconnect(loginRunnable.getConn());
     }
 
@@ -81,7 +84,7 @@ public class LoginManager {
         private URL url;
         private HttpURLConnection conn;
 
-        public LoginRunnable(Handler handler, String urlString, String requestBody){
+        public LoginRunnable(Handler handler, String urlString, String requestBody) {
             this.handler = handler;
             this.urlString = urlString;
             this.requestBody = requestBody;
@@ -111,9 +114,6 @@ public class LoginManager {
                 } else {
                     message.what = Constants.SERVER_ERROR;
                 }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                message.what = Constants.LOGIN_EXCEPTION;
             } catch (IOException e) {
                 e.printStackTrace();
                 message.what = Constants.LOGIN_EXCEPTION;
@@ -126,7 +126,7 @@ public class LoginManager {
             }
         }
 
-        public HttpURLConnection getConn(){
+        public HttpURLConnection getConn() {
             return conn;
         }
     }

@@ -8,18 +8,23 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.util.Properties;
 
+import ind.hailin.dailynus.entity.Users;
+
 /**
  * Created by hailin on 2017/5/27.
  */
 
 public class DataApplication extends Application {
 
-    private static Application application;
+    private static DataApplication application;
     private AssetManager assetsManager;
     private Properties properties;
 
-    public DataApplication(){
+    private Users user;
+
+    public DataApplication() {
         application = this;
+        user = new Users();
     }
 
     @Override
@@ -39,11 +44,19 @@ public class DataApplication extends Application {
         return properties.getProperty(key);
     }
 
-    public AssetManager getAssetsManager(){
+    public AssetManager getAssetsManager() {
         return this.assetsManager;
     }
 
-    public static Application getApplication(){
+    public static DataApplication getApplication() {
         return application;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 }

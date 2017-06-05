@@ -1,27 +1,23 @@
 package ind.hailin.dailynus.activity;
 
-import android.content.DialogInterface;
-import android.content.Intent;
+
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import ind.hailin.dailynus.R;
 import ind.hailin.dailynus.application.DataApplication;
 import ind.hailin.dailynus.entity.Users;
 import ind.hailin.dailynus.fragment.UserInfoFragment;
+import ind.hailin.dailynus.utils.Constants;
 
-public class FormActivity extends AbstractUserInfoActivity {
-    public static final String TAG = "FormActivity";
+public class ProfileActivity extends AbstractUserInfoActivity {
+    public static final String TAG = "ProfileActivity";
+
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +25,17 @@ public class FormActivity extends AbstractUserInfoActivity {
     }
 
     @Override
+    public void onChange() {
+        menu.getItem(0).setEnabled(true);
+        menu.getItem(0).setVisible(true);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_done, menu);
+        menu.getItem(0).setEnabled(false);
+        menu.getItem(0).setVisible(false);
         return true;
     }
 
@@ -68,7 +73,10 @@ public class FormActivity extends AbstractUserInfoActivity {
             return;
         }
 
-        super.uploadUser();
+        if (!user.toString().equals(userUnchanged))
+            super.uploadUser();
+        else
+            finish();
     }
 
     private void sendShortToast(String str) {
@@ -76,6 +84,7 @@ public class FormActivity extends AbstractUserInfoActivity {
     }
 
     @Override
-    public void onChange() {
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

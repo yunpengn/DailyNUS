@@ -77,8 +77,6 @@ public class SmallSlideMenuView extends RelativeLayout implements View.OnClickLi
         ivClear.setOnClickListener(this);
         ivMenu.setOnClickListener(this);
         tvMenuUnder.setOnClickListener(this);
-
-        closeNoAnimate();
     }
 
     @Override
@@ -95,6 +93,7 @@ public class SmallSlideMenuView extends RelativeLayout implements View.OnClickLi
                 break;
             case R.id.view_clear:
                 tvMenuUnder.setText("");
+                closeMenu();
                 break;
         }
     }
@@ -163,8 +162,12 @@ public class SmallSlideMenuView extends RelativeLayout implements View.OnClickLi
         Log.d(TAG, "close");
     }
 
-    private void closeNoAnimate() {
+    public void closeNoAnimate() {
         closeMenu(1);
+    }
+
+    public boolean isOpen(){
+        return isOpen;
     }
 
     public void setMenuShow(int number) {

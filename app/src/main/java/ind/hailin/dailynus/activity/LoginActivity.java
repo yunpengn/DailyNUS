@@ -18,19 +18,27 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import ind.hailin.dailynus.R;
+import ind.hailin.dailynus.application.DataApplication;
+import ind.hailin.dailynus.entity.Users;
 import ind.hailin.dailynus.exception.DesException;
+import ind.hailin.dailynus.handler.QueryJsonHandler;
 import ind.hailin.dailynus.utils.Constants;
 import ind.hailin.dailynus.utils.DesEncryption;
+import ind.hailin.dailynus.utils.MyJsonParsers;
 import ind.hailin.dailynus.web.LoginManager;
+import ind.hailin.dailynus.web.QueryJsonManager;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = "LoginActivity";
 
     private SharedPreferences sp;
     private LoginManager loginManager;
+    private QueryJsonManager queryJsonManager;
 
     private EditText etUsername, etPassword;
     private CheckBox checkBox;
@@ -44,11 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 case Constants.LOGIN_SUCCESS:
                     String requestBody = (String) msg.obj;
                     storeUsernameAndPassword(requestBody);
-
                     queryUserData(requestBody);
-                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish();
                     break;
                 case Constants.LOGIN_AUTHENTICATION_ERROR:
                     Snackbar.make(getWindow().getDecorView(), "Sorry, wrong username/password", Snackbar.LENGTH_LONG).show();
@@ -68,13 +72,57 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
+    private final Handler userInfoHandler = new QueryJsonHandler() {
+        @Override
+        public void success(Message msg) {
+            Log.d(TAG, "userInfoHandler success");
+            InputStream inputStream = (InputStream) msg.obj;
+            try {
+                Users user = MyJsonParsers.getEncryptedUserInfo(inputStream);
+                DataApplication.getApplication().setUser(user);
+                Log.d(TAG, "user: "+user.toString());
+
+                if (user.getGender() == null || user.getGender().isEmpty()){
+                    startActivity(new Intent(LoginActivity.this, FormActivity.class));
+                } else {
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                }
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+            } catch (IOException e) {
+                e.printStackTrace();
+                failure(msg);
+            } catch (DesException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (inputStream != null)
+                        inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void failure(Message msg) {
+            Snackbar.make(getWindow().getDecorView(), "Sorry, there are some small problems, please try again", Snackbar.LENGTH_LONG).show();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         sp = getSharedPreferences("config", Context.MODE_PRIVATE);
+        initHttpManager();
         initView();
+    }
+
+    private void initHttpManager(){
+        loginManager = new LoginManager();
+        queryJsonManager = new QueryJsonManager(3000, Constants.JSON_TYPE_USER);
     }
 
     private void initView() {
@@ -123,7 +171,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
                 // login use my own server
-                loginManager = new LoginManager();
                 loginManager.queryLogin(this, handler, inputUsername, inputPassword, false);
                 break;
             case R.id.login_tv_forgot:
@@ -136,28 +183,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    /**
-     * EditText loses its focus when touching outside
-     */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            View v = getCurrentFocus();
-            if ( v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
-                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                }
-            }
-        }
-        return super.dispatchTouchEvent(event);
-    }
-
     private void queryUserData(String requestBody) {
-        //TODO
+        Log.d(TAG, "requestBody: "+requestBody);
+        String username = requestBody.substring(0, requestBody.indexOf(":"));
+        queryJsonManager.query(this, userInfoHandler, username);
     }
 
     private void storeUsernameAndPassword(String requestBody){
@@ -182,5 +211,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onDestroy() {
         super.onDestroy();
         //if(loginManager!=null)loginManager.stop();
+    }
+
+    /**
+     * EditText loses its focus when touching outside
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 }
