@@ -29,11 +29,25 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+
+# Front-end form builder API and necessary CSS/JavaScript framework
+gem 'simple_form'
+gem 'bootstrap3-datetimepicker-rails'
+gem 'bootstrap-select-rails'
+
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+gem 'js_cookie_rails'
+gem 'jquery-ui-rails'
+
+# Use for authentication module
+gem 'devise'
+# Use ActiveModel has_secure_password
+gem 'bcrypt'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

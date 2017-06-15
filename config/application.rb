@@ -14,5 +14,8 @@ module DailyNUS
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
+
+    # Set the default timezone to be Singapore (due to customers).
+    config.time_zone = 'Asia/Singapore'
   end
 end
