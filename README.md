@@ -3,21 +3,25 @@
 ## System dependencies
 - [Ruby](https://www.ruby-lang.org/) 2.3.3
 - [Ruby on Rails](http://rubyonrails.org/) 5.1.1
+
+## Ruby GEM plugins
 - [mysql2](https://github.com/brianmario/mysql2)
+- [simple_form](https://github.com/plataformatec/simple_form)
+- [devise](https://github.com/plataformatec/devise)
+
 
 ## Configuration
 - Use bundle install to install all the dependencies required.
+
 - Make sure you rename config/database.example.yml into config/database.yml and change the database connection information.
 
 * Database creation
 
+- Run bundle exec rake db:create to create the required (blank) database 
+
 * Database initialization
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
+- No need to initialze the database, you can run the system with a blank database.
 
 * ...
 

@@ -12,4 +12,11 @@
 //
 //= require rails-ujs
 //= require turbolinks
+
+//= require jquery
+//= require jquery-ui
+//= require jquery.turbolinks
+//= require js.cookie
+//= require jquery_ujs
+
 //= require_tree .

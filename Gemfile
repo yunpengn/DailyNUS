@@ -8,8 +8,6 @@ end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.1'
-# Use sqlite3 as the database for Active Record (abandoned in DailyNUS)
-gem 'sqlite3'
 # Use mysql2 as the database adapter
 gem 'mysql2'
 # Use Puma as the app server
@@ -25,6 +23,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.2'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
+gem 'jquery-turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
@@ -36,6 +35,7 @@ gem 'jbuilder', '~> 2.5'
 
 # Front-end form builder API and necessary CSS/JavaScript framework
 gem 'simple_form'
+gem 'bootstrap-sass'
 gem 'bootstrap3-datetimepicker-rails'
 gem 'bootstrap-select-rails'
 
@@ -46,15 +46,24 @@ gem 'jquery-ui-rails'
 
 # Use for authentication module
 gem 'devise'
-# Use ActiveModel has_secure_password
-gem 'bcrypt'
+# Use ActiveModel has_secure_password by bcrypt.
+# Notice the platform option is important, especially for Windows.
+gem 'bcrypt', platforms: :ruby
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
+
   gem 'selenium-webdriver'
+
+  # Use bullet to automatically detect N + 1 query
+  gem 'bullet'
+
+  # Ruby static code analyzer
+  gem 'rubocop', require: false
 end
 
 group :development do
